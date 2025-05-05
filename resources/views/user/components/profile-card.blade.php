@@ -51,11 +51,11 @@
                                         Taiko
                                     @break
 
-                                    @case(3)
+                                    @case(2)
                                         Catch
                                     @break
 
-                                    @case(4)
+                                    @case(3)
                                         Mania
                                     @break
 
