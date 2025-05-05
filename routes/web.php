@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,12 +16,19 @@ use Illuminate\Support\Facades\Route;
 */
 // USERS
 Route::get('/', [UserController::class, 'index']);
-Route::post('/gnetot-upload', [UserController::class, 'gnetotUpload'])->name('gnetot-upload');
 
+// Route::post('/gnetot-upload', [UserController::class, 'gnetotUpload'])->name('gnetot-upload');
+Route::middleware(['web'])->group(function () {
+    Route::get('/login', [UserController::class, 'login']);
+    Route::post('/login/process', [UserController::class, 'loginProcess'])->name('loginProcess');
+});
 
-// ADMIN
-Route::get('/admin/dashboard', [AdminController::class, 'index']);
-Route::get('/admin/login', [LoginController::class, 'login']);
-Route::post('/admin/login/process', [LoginController::class, 'loginProcess'])->name('loginProcess');
+Route::get('/u/{id}', [UserController::class, 'profile'])->name('profile');
+Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+// Route::get('/register', [UserController::class, 'register']); WIP
 
-Route::get('/get_player_count', [AdminController::class, 'getPlayerCount']);
+// ADMIN(WIP)
+// Route::get('/admin/dashboard', [AdminController::class, 'index']);
+// Route::get('/admin/login', [AdminController::class, 'adminLogin']);
+// Route::post('/admin/login/process', [AdminController::class, 'adminLoginProcess'])->name('adminLoginProcess');
+// Route::get('/admin/logout', [AdminController::class, 'adminLogout'])->name('adminLogout');

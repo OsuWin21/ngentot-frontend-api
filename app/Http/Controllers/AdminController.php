@@ -7,6 +7,8 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -15,6 +17,7 @@ class AdminController extends Controller
         if (!auth()->check()) {
             return redirect('/admin/login');
         } else {
+
             $adminData = DB::table('users')->select('*')
                 ->get();
 
@@ -79,25 +82,39 @@ class AdminController extends Controller
         }
     }
 
-    public function getPlayerCount()
+    public function adminLogin()
     {
-        $response = Http::get('https://api.randomflies.my.id/v1/get_player_count');
-
-        if ($response->successful()) {
-            $data = $response->json();
-
-            return response()->json([
-                'status' => 'success',
-                'counts' => [
-                    'online' => $data['counts']['online'],
-                    'total' => $data['counts']['total'],
-                ],
-            ]);
+        if (!auth()->check()) {
+            return view('admin.login');
         } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch player count.',
-            ], 500);
+            return redirect('/admin/dashboard');
         }
+    }
+
+    public function adminLoginProcess(Request $request)
+    {
+        $data = [
+            'name' => $request->input('username'),
+            'pw_bcrypt' => md5($request->input('pw_bcrypt'))
+        ];
+
+        // See the password_hash() example to see where this came from.
+        $hash = DB::table('users')->select('pw_bcrypt')
+            ->where('name', $data['name'])
+            ->first();
+        $user = User::where('name', $data['name'])->first();
+
+        if ($user && password_verify($data['pw_bcrypt'], $user->pw_bcrypt)) {
+            Auth::login($user);
+            return redirect('/admin/dashboard');
+        } else {
+            return redirect('/admin/login')->with('error', 'Invalid username or password');
+        }
+    }
+
+    public function adminLogout()
+    {
+        Auth::logout(); // Logout the user
+        return redirect('/admin/login')->with('success', 'You have been logged out successfully.');
     }
 }

@@ -7,6 +7,9 @@
     <title>NGENTOT</title>
 </head>
 <body>
+    @if (Auth::user())
+        halo {{Auth::user()->name}} kontol
+    @endif
     <form action="{{ route('gnetot-upload')}}" method="POST">
         @csrf
         <input type="file" name="ngentot" id="">

@@ -39,7 +39,7 @@
                             </div>
                             <h4>Ngentot! let's get signed in</h4>
                             <h6 class="font-weight-light">Sign in to continue.</h6>
-                            <form class="pt-3" method="POST" action="{{ route('loginProcess') }}">
+                            <form class="pt-3" method="POST" action="{{ route('adminLoginProcess') }}">
                                 @csrf
                                 <div class="form-group">
                                     <input type="text" class="form-control form-control-lg" id="username"
