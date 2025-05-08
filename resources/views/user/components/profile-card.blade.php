@@ -16,7 +16,7 @@
                 <div class="card-profile-header position-relative d-flex">
                     <a href="#" class="card-profile-photo text-decoration-none mb-2">
                         <span class="me-2"
-                            style="background-image: url('avatars/{{$user->id}}.png');">
+                            style="background-image: url({{ Storage::disk('public')->exists("/avatars/$user->id.jpg") ? asset("storage/avatars/$user->id.jpg") : asset("storage/avatars/default.jpg")}});">
                         </span>
                     </a>
                 </div>
