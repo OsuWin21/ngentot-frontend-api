@@ -16,7 +16,7 @@
                 <div class="card-profile-header position-relative d-flex">
                     <a href="#" class="card-profile-photo text-decoration-none mb-2">
                         <span class="me-2"
-                            style="background-image: url('https://a.ppy.sh/16748213?1744792519.jpeg');">
+                            style="background-image: url('../../avatars/{{$user->id}}.png');">
                         </span>
                     </a>
                 </div>
