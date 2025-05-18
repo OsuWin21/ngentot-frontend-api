@@ -24,6 +24,7 @@ Route::middleware(['web'])->group(function () {
 });
 
 Route::get('/u/{id}', [UserController::class, 'profile'])->name('profile');
+Route::get('/u/edit/{id}', [UserController::class, 'editProfile'])->name('editProfile');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 // Route::get('/register', [UserController::class, 'register']); WIP
 

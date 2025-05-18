@@ -111,11 +111,11 @@ class UserController extends Controller
                         MAX(pp) as max_pp 
                       FROM scores 
                       WHERE mode = ' . $combinedMode . ' 
-                        AND status != 0
-                      GROUP BY map_md5) as max_scores'),
+                        AND status = 2
+                      GROUP BY map_md5) as max_pps'),
                         function ($join) {
-                            $join->on('scores.map_md5', '=', 'max_scores.map_md5')
-                                ->on('scores.pp', '=', 'max_scores.max_pp');
+                            $join->on('scores.map_md5', '=', 'max_pps.map_md5')
+                                 ->on('scores.pp', '=', 'max_pps.max_pp');
                         }
                     )
                     ->select(
@@ -188,7 +188,7 @@ class UserController extends Controller
                     });
             }
 
-
+dd($firstPlaces);
             $firstPlaces->transform(function ($play) {
                 $play->mods_list = $this->decodeMods($play->mods);
                 return $play;
@@ -243,6 +243,18 @@ class UserController extends Controller
             'mode' => $mode,
             'rx' => $rx,
             'userProfile' => $userProfile
+        ]);
+    }
+
+    public function editProfile($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found');
+        }
+
+        return view('user.edit', [
+            'user' => $user
         ]);
     }
 
