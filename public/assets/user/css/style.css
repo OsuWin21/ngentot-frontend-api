@@ -16091,7 +16091,8 @@ button:focus {
 }
 
 textarea {
-  resize: none;
+  resize: vertical;
+  max-height: 250px;
   overflow-x: hidden;
 }
 
@@ -21372,9 +21373,27 @@ dl li {
   overflow-x: hidden;
   overflow-y: scroll;
   max-height: 400px !important;
+  min-height: 400px;
 }
 
 .markdown img {
   max-width: 700px;
   max-height: 100%;
+}
+
+.cropper-container {
+  max-width: 100%;
+}
+
+#cropPreview {
+  object-fit: cover;
+}
+
+#bgPreview,
+#bgCropPreview {
+  object-fit: cover;
+}
+
+.cropper-view-box.bg-cropper {
+  border-color: red !important;
 }

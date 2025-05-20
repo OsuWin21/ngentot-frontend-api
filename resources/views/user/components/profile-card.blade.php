@@ -3,11 +3,13 @@
         <div class="row">
             <div class="col px-0">
                 <div class="card-profile-bg position-relative rounded-top"
-                    style="background-image: url('https://assets.ppy.sh/user-profile-covers/16748213/328b119ca500b08d39ca51bdbc398932bdbbdc8bb6076b2ce56dfb01cde3392e.jpeg');">
+                    style="background-image: url('{{ Storage::disk('public')->exists("/backgrounds/$user->id.png") ? asset("storage/backgrounds/$user->id.png") : asset("storage/backgrounds/default.png") }}');">
+                    @if ( Auth::user()->id ?? '' == $user->id)
                     <span
                         class="bg-gradient-primary text-white me-2 position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center rounded-circle">
-                        <i class="mdi mdi-pencil"></i>
+                        <a href="/u/edit/{{ $user->id }}" class="text-light"><i class="mdi mdi-pencil"></i></a>
                     </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -16,7 +18,7 @@
                 <div class="card-profile-header position-relative d-flex">
                     <a href="#" class="card-profile-photo text-decoration-none mb-2">
                         <span class="me-2"
-                            style="background-image: url({{ Storage::disk('public')->exists("/avatars/$user->id.jpg") ? asset("storage/avatars/$user->id.jpg") : asset("storage/avatars/default.jpg")}});">
+                            style="background-image: url({{ Storage::disk('public')->exists("/avatars/$user->id.png") ? asset("storage/avatars/$user->id.png") : asset("storage/avatars/default.png")}});">
                         </span>
                     </a>
                 </div>
@@ -130,13 +132,7 @@
         <div class="row d-flex align-items-center px-5 bg-light py-3 pb-5">
             <div class="col-sm markdown">
 @markdown
-# test markdown 
-
-This is a [link to our website](https://spatie.be) 
-                    
-This is really***very***important text.
-
-![d](https://img-s-msn-com.akamaized.net/tenant/amp/entityid/BB1msMCi?w=0&h=0&q=60&m=6&f=jpg&u=t)
+{{ $user->userpage_content }}
 @endmarkdown
             </div>
             <div class="col-sm-3 overflow-auto">

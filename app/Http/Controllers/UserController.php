@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
+
 
 class UserController extends Controller
 {
@@ -115,7 +118,7 @@ class UserController extends Controller
                       GROUP BY map_md5) as max_pps'),
                         function ($join) {
                             $join->on('scores.map_md5', '=', 'max_pps.map_md5')
-                                 ->on('scores.pp', '=', 'max_pps.max_pp');
+                                ->on('scores.pp', '=', 'max_pps.max_pp');
                         }
                     )
                     ->select(
@@ -134,7 +137,6 @@ class UserController extends Controller
                         'maps.version as map_version'
                     )
                     ->where('maps.status', '!=', 0)
-                    ->where('scores.status', 2)
                     ->where('scores.userid', $id)
                     ->where('scores.mode', $combinedMode)
                     ->orderBy('scores.play_time', 'desc')
@@ -153,7 +155,7 @@ class UserController extends Controller
                         MAX(score) as max_score 
                       FROM scores 
                       WHERE mode = ' . $mode . ' 
-                        AND status != 0
+                        AND status = 2
                       GROUP BY map_md5) as max_scores'),
                         function ($join) {
                             $join->on('scores.map_md5', '=', 'max_scores.map_md5')
@@ -176,7 +178,6 @@ class UserController extends Controller
                         'maps.version as map_version'
                     )
                     ->where('maps.status', '!=', 0)
-                    ->where('scores.status', 2)
                     ->where('scores.userid', $id)
                     ->where('scores.mode', $mode)
                     ->orderBy('scores.play_time', 'desc')
@@ -188,7 +189,6 @@ class UserController extends Controller
                     });
             }
 
-dd($firstPlaces);
             $firstPlaces->transform(function ($play) {
                 $play->mods_list = $this->decodeMods($play->mods);
                 return $play;
@@ -249,13 +249,65 @@ dd($firstPlaces);
     public function editProfile($id)
     {
         $user = User::find($id);
+
         if (!$user) {
             return redirect()->back()->with('error', 'User not found');
+        } else if ($user != Auth::user()) {
+            return redirect()->back()->with('error', 'You are not authorized to edit this profile');
+        } else {
+            if ($user && $user->country) {
+                $user->country = country($user->country)->getOfficialName();
+            }
+
+            return view('user.edit', [
+                'user' => $user
+            ]);
+        }
+    }
+
+    public function editProcess(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $response = ['success' => true];
+
+        // Simpan konten halaman pengguna
+        if ($request->has('userpage-content')) {
+            $user->userpage_content = $request->input('userpage-content');
+            $user->save();
         }
 
-        return view('user.edit', [
-            'user' => $user
-        ]);
+        // Simpan avatar
+        if ($request->hasFile('avatar')) {
+            $avatarPath = 'avatars/' . $user->id . '.png';
+            Storage::disk('public')->put($avatarPath, file_get_contents($request->file('avatar')));
+        }
+
+        // Simpan background
+        if ($request->hasFile('background')) {
+            $bgPath = 'backgrounds/' . $user->id . '.png';
+            Storage::disk('public')->put($bgPath, file_get_contents($request->file('background')));
+        }
+
+        // Verifikasi apakah file berhasil disimpan
+        if ($request->hasFile('avatar')) {
+            $avatarPath = 'avatars/' . $user->id . '.png';
+            if (Storage::disk('public')->exists($avatarPath)) {
+                $response['avatar'] = Storage::url($avatarPath);
+            } else {
+                return response()->json(['success' => false, 'error' => 'Avatar gagal disimpan'], 500);
+            }
+        }
+
+        if ($request->hasFile('background')) {
+            $bgPath = 'backgrounds/' . $user->id . '.png';
+            if (Storage::disk('public')->exists($bgPath)) {
+                $response['background'] = Storage::url($bgPath);
+            } else {
+                return response()->json(['success' => false, 'error' => 'Background gagal disimpan'], 500);
+            }
+        }
+
+        return response()->json($response);
     }
 
     private function decodeMods($modsValue)
