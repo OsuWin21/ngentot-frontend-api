@@ -1,4 +1,3 @@
-// Avatar Cropper
 const imageInput = document.getElementById('imageInput');
 const imagePreview = document.getElementById('imagePreview');
 const cropPreview = document.getElementById('cropPreview');
@@ -138,7 +137,7 @@ cropButton.addEventListener('click', async (e) => {
                         document.querySelectorAll('.user-background').forEach(img => img.src = data.background + '?t=' + Date.now());
                     }
                     alert('Update berhasil!');
-                    window.location.reload();
+                    window.location.href = window.location.pathname + '?t=' + new Date().getTime();
                 } else {
                     throw new Error(data.error || 'Unknown error');
                 }
@@ -148,7 +147,7 @@ cropButton.addEventListener('click', async (e) => {
                 alert(`Error: ${error.message}`);
             });
     } else {
-        alert('Tidak ada perubahan yang dilakukan!');
+        alert('No changes!');
     }
 
 });
