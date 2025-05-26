@@ -3,12 +3,12 @@
         <div class="row">
             <div class="col px-0">
                 <div class="card-profile-bg position-relative rounded-top"
-                    style="background-image: url('{{ Storage::disk('public')->exists("/backgrounds/$user->id.png") ? asset("storage/backgrounds/$user->id.png") : asset("storage/backgrounds/default.png") }}');">
-                    @if ( Auth::user()->id ?? '' == $user->id)
-                    <span
-                        class="bg-gradient-primary text-white me-2 position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center rounded-circle">
-                        <a href="/u/edit/{{ $user->id }}" class="text-light"><i class="mdi mdi-pencil"></i></a>
-                    </span>
+                    style="background-image: url('{{ Storage::disk('public')->exists("/backgrounds/$user->id.png") ? asset("storage/backgrounds/$user->id.png") : asset('storage/backgrounds/default.png') }}');">
+                    @if (Auth::user()->id ?? '' == $user->id)
+                        <span
+                            class="bg-gradient-primary text-white me-2 position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center rounded-circle">
+                            <a href="/u/edit/{{ $user->id }}" class="text-light"><i class="mdi mdi-pencil"></i></a>
+                        </span>
                     @endif
                 </div>
             </div>
@@ -18,28 +18,27 @@
                 <div class="card-profile-header position-relative d-flex">
                     <a href="#" class="card-profile-photo text-decoration-none mb-2">
                         <span class="me-2"
-                            style="background-image: url({{ Storage::disk('public')->exists("/avatars/$user->id.png") ? asset("storage/avatars/$user->id.png") : asset("storage/avatars/default.png")}});">
+                            style="background-image: url({{ Storage::disk('public')->exists("/avatars/$user->id.png") ? asset("storage/avatars/$user->id.png") : asset('storage/avatars/default.png') }});">
                         </span>
                     </a>
                 </div>
             </div>
-            <div class="col-sm-3 px-0">
-                <div class="card-profile-name position-relative">
-                    <h2>{{ $user->name }}</h2>
+            <div class="col-sm-3 px-0 d-flex gap-2">
+                <div class="card-profile-name position-relative pt-1">
+                    <a class="text-decoration-none text-black" href="#" style="height: fit-content !important;">
+                        <img src="{{ $user->flag_url }}" alt="{{ $user->country }}" srcset="" width="30px">
+                    </a>
                 </div>
                 <div class="card-profile-details position-relative">
-                    <a class="text-decoration-none text-black" href="">
-                        <img src="{{ $user->flag_url }}" alt="{{ $user->country }}" srcset="" width="30px">
-                        {{ $user->country_name }}
-                    </a>
-                    <a class="text-decoration-none text-muted" href="">
+                    <h3 class="fs-3 m-0">{{ $user->name }}</h3>
+                    <a class="text-decoration-none text-muted" href="#">
                         Clans Soon.
                     </a>
                 </div>
             </div>
             <div class="col-sm d-flex px-0 align-items-center justify-content-end">
                 <div class="card-profile-modes position-relative">
-                    <div class="d-flex align-items-center flex-wrap gap-3 mb-3 justify-content-end">
+                    <div class="d-flex align-items-center flex-wrap gap-3 justify-content-end">
                         <!-- Mode Selector -->
                         <div class="btn-group">
                             <button class="btn btn-gradient-primary dropdown-toggle" type="button" id="modeDropdown"
@@ -135,30 +134,44 @@
 {{ $user->userpage_content }}
 @endmarkdown
             </div>
-            <div class="col-sm-3 overflow-auto">
+            <div class="col-sm-4 overflow-auto">
                 <div class="card-body py-0">
                     <h5 class="card-title">Player Stats</h5>
-                    </p>
-                    <table class="table table-borderless">
-                        <tbody>
-                            @foreach ((array) $userProfile as $key => $value)
-                                <tr>
-                                    <td class="w-50 p-1">{{ $key }}</td>
-                                    <td class="w-50 p-1">
-                                        @if ($key === 'Total Play Time')
-                                            {{ number_format($value / 3600, 2) }} hours
-                                        @elseif($key === 'Hit Accuracy')
-                                            {{ number_format($value, 3) }}%
-                                        @elseif(is_numeric($value) && $value >= 1000)
-                                            {{ number_format($value) }}
-                                        @else
-                                            {{ $value }}
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="row g-0">
+                        <!-- Header -->
+                        <div class="col-6 text-center p-1 border-bottom">
+                            @if ($global_rank > 0)
+                                <h4 class="text-muted">Global Rank</h4>
+                                <h5>#{{ $global_rank }}</h5>
+                            @else
+                                Unranked
+                            @endif
+                        </div>
+                        <div class="col-6 text-center p-1 border-bottom">
+                            @if ($country_rank > 0)
+                                <h4 class="text-muted">Country Rank</h4>
+                                <h5>#{{ $country_rank }}</h5>
+                            @else
+                                Unranked
+                            @endif
+                        </div>
+
+                        <!-- Body -->
+                        @foreach ((array) $user_profile as $key => $value)
+                            <div class="col-6 p-1">{{ $key }}</div>
+                            <div class="col-6 p-1">
+                                @if ($key === 'Total Play Time')
+                                    {{ number_format($value / 3600, 2) }} hours
+                                @elseif($key === 'Hit Accuracy')
+                                    {{ number_format($value, 3) }}%
+                                @elseif(is_numeric($value) && $value >= 1000)
+                                    {{ number_format($value) }}
+                                @else
+                                    {{ $value }}
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

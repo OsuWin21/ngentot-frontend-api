@@ -82,27 +82,41 @@ class UserController extends Controller
 
             $combinedMode = $rx + $mode;
 
-            # Get the user's profile informations and stats
+            # Get the user's Stats
             $userProfile = DB::table('stats')
-                ->selectRaw('
-                    rscore AS `Ranked Score`,
-                    acc AS `Hit Accuracy`,
-                    plays AS `Play Count`,
-                    tscore AS `Total Score`,
-                    total_hits AS `Total Hits`,
-                    max_combo AS `Max Combo`,
-                    replay_views AS `Replays Watched by Others`,
-                    pp AS `PP`,
-                    playtime AS `Total Play Time`,
-                    xh_count AS `XH Count`,
-                    x_count AS `X Count`,
-                    sh_count AS `SH Count`,
-                    s_count AS `S Count`,
-                    a_count AS `A Count`
-                ')
+                ->selectRaw('rscore AS `Ranked Score`,
+                            acc AS `Hit Accuracy`,
+                            plays AS `Play Count`,
+                            tscore AS `Total Score`,
+                            total_hits AS `Total Hits`,
+                            max_combo AS `Max Combo`,
+                            replay_views AS `Replays Watched by Others`,
+                            pp AS `PP`,
+                            playtime AS `Total Play Time`,
+                            xh_count AS `XH Count`,
+                            x_count AS `X Count`,
+                            sh_count AS `SH Count`,
+                            s_count AS `S Count`,
+                            a_count AS `A Count`')
                 ->where('id', $id)
                 ->where('mode', $combinedMode)
                 ->first();
+
+            $countryCode = DB::table('users')->where('id', $id)->value('country');
+            $globalRank = DB::table('stats')
+                ->where('mode', $combinedMode)
+                ->where('pp', '>', $userProfile->PP ?? 0)
+                ->count() + 1;
+
+            $countryRank = DB::table('stats')
+                ->join('users', 'users.id', '=', 'stats.id')
+                ->where('stats.mode', $combinedMode)
+                ->where('users.country', $countryCode)
+                ->where('stats.pp', '>', $userProfile->PP ?? 0)
+                ->count() + 1;
+
+            $userProfile->{'Global Rank'} = $globalRank;
+            $userProfile->{'Country Rank'} = $countryRank;
 
             # Get the user's first place scores
             if ($rx != 0) {
@@ -242,7 +256,9 @@ class UserController extends Controller
             'recent_plays' => $recentPlays,
             'mode' => $mode,
             'rx' => $rx,
-            'userProfile' => $userProfile
+            'user_profile' => $userProfile,
+            'global_rank' => $globalRank,
+            'country_rank' => $countryRank,
         ]);
     }
 
