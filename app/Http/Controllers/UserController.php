@@ -115,9 +115,6 @@ class UserController extends Controller
                 ->where('stats.pp', '>', $userProfile->PP ?? 0)
                 ->count() + 1;
 
-            $userProfile->{'Global Rank'} = $globalRank;
-            $userProfile->{'Country Rank'} = $countryRank;
-
             # Get the user's first place scores
             if ($rx != 0) {
                 $firstPlaces = DB::table('scores')
