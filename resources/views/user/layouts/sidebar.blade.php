@@ -26,14 +26,14 @@
                             <a class="nav-link" href="/u/{{ Auth::user()->id }}">My Profile</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">Sign Out</a>
+                            <a class="nav-link" href="{{ route('logout') }}">Sign Out</a>
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Sign In</a>
+                            <a class="nav-link" href="{{ route('login') }}">Sign In</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Sign Up</a>
+                            <a class="nav-link" href="{{ route('register') }}">Sign Up</a>
                         </li>
                     @endif
                 </ul>

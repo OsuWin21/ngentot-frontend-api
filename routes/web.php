@@ -20,7 +20,7 @@ Route::get('/', [UserController::class, 'index']);
 Route::middleware(['web'])->group(function () {
     Route::get('/register', [UserController::class, 'register'])->name('register');
     Route::post('/register/process', [UserController::class, 'registerProcess'])->name('registerProcess');
-    Route::get('/login', [UserController::class, 'login']);
+    Route::get('/login', [UserController::class, 'login'])->name('login');
     Route::post('/login/process', [UserController::class, 'loginProcess'])->name('loginProcess');
 });
 
