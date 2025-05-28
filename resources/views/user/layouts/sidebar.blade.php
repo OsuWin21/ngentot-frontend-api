@@ -5,7 +5,7 @@
                 aria-controls="profile-menu">
                 <div class="nav-profile-image">
                     @if (Auth::check())
-                    <img src="{{ Storage::disk('public')->exists("/avatars/$user->id.png") ? asset("storage/avatars/$user->id.png") : asset('storage/avatars/default.png') }}"
+                    <img src="{{ Storage::disk('public')->exists("/avatars/{{ Auth::user()->id }}.png") ? asset("storage/avatars/{{ Auth::user()->id }}.png") : asset('storage/avatars/default.png') }}"
                         alt="profile">
                     @else
                         <img src="{{ asset('storage/avatars/default.png') }}" alt="profile">
