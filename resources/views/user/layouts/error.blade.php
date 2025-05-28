@@ -1,4 +1,4 @@
-<div class="fixed-top">
+<div class="fixed-top" style="z-index: 9999">
     <div class="alert alert-primary alert-dismissible fade position-relative show m-0 pb-0" role="alert" id="alphaAlert"
         style="display: none;">
         <p>This is an alpha version of osu!win21, please do not use this for production purposes. Work in progress.
