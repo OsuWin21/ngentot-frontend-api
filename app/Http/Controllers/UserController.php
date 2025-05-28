@@ -392,7 +392,7 @@ class UserController extends Controller
             if (Storage::disk('public')->exists($avatarPath)) {
                 $response['avatar'] = Storage::url($avatarPath);
             } else {
-                return response()->json(['success' => false, 'error' => 'Avatar gagal disimpan'], 500);
+                return response()->json(['success' => false, 'error' => 'Failed to Store Avatar'], 500);
             }
         }
 
@@ -401,7 +401,7 @@ class UserController extends Controller
             if (Storage::disk('public')->exists($bgPath)) {
                 $response['background'] = Storage::url($bgPath);
             } else {
-                return response()->json(['success' => false, 'error' => 'Background gagal disimpan'], 500);
+                return response()->json(['success' => false, 'error' => 'Failed to Store Background'], 500);
             }
         }
 

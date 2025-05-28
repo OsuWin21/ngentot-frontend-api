@@ -37,7 +37,7 @@ function handleImageUpload(e, options) {
     if (!file) return;
 
     if (!['image/png', 'image/jpeg'].includes(file.type)) {
-        alert('Hanya format PNG dan JPG yang diperbolehkan!');
+        alert('Only .PNG and .JPG File Allowed.');
         e.target.value = '';
         return;
     }
@@ -136,7 +136,7 @@ cropButton.addEventListener('click', async (e) => {
                     if (data.background) {
                         document.querySelectorAll('.user-background').forEach(img => img.src = data.background + '?t=' + Date.now());
                     }
-                    alert('Update berhasil!');
+                    alert('Update Successful!');
                     window.location.href = window.location.pathname + '?t=' + new Date().getTime();
                 } else {
                     throw new Error(data.error || 'Unknown error');
