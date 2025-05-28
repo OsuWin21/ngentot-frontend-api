@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>osu!Ngentot - {{ $user->name }}'s Profile</title>
+    <title>osu!win21 - {{ $user->name }}'s Profile</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="{{ asset('assets/user/vendors/mdi/css/materialdesignicons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/user/vendors/css/vendor.bundle.base.css') }}">
@@ -22,14 +22,11 @@
 </head>
 
 <body>
+    @include('user.layouts.error')
     <div class="container-fluid p-0">
-        <!-- partial:partials/_navbar.html -->
         @include('user.layouts.navbar')
-        <!-- partial -->
         <div class="container-fluid page-body-wrapper">
-            <!-- partial:partials/_sidebar.html -->
             @include('user.layouts.sidebar')
-            <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -54,13 +51,8 @@
                 </div>
             </div>
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
         @include('user.layouts.footer')
-        <!-- partial -->
     </div>
-    <!-- main-panel ends -->
-
 
     {{-- Chart Data --}}
     {{-- <script>
@@ -140,6 +132,7 @@
     <script src="{{ asset('assets/user/js/chart.js') }}"></script>
     <script src="{{ asset('assets/user/js/dashboard.js') }}"></script>
     <script src="{{ asset('assets/user/js/todolist.js') }}"></script>
+    <script src="{{ asset('assets/user/js/error.js') }}"></script>
     <!-- End custom js for this page -->
 </body>
 

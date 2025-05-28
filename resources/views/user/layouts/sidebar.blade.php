@@ -4,16 +4,17 @@
             <a class="nav-link" data-bs-toggle="collapse" href="#profile-menu" aria-expanded="false"
                 aria-controls="profile-menu">
                 <div class="nav-profile-image">
-                    <img src="https://cdn.discordapp.com/emojis/1199139517198770206.png?size=48&quality=lossless"
+                    @if (Auth::check())
+                    <img src="{{ Storage::disk('public')->exists("/avatars/$user->id.png") ? asset("storage/avatars/$user->id.png") : asset('storage/avatars/default.png') }}"
                         alt="profile">
-                    <span class="login-status online"></span>
+                    @else
+                        <img src="{{ asset('storage/avatars/default.png') }}" alt="profile">
+                    @endif
+                    {{-- <span class="login-status online"></span> --}}
                 </div>
                 <div class="nav-profile-text d-flex flex-column">
-                    <span class="font-weight-bold mb-2">
+                    <span class="font-weight-bold[]">
                         {{ Auth::check() ? Auth::user()->name : 'Guest' }}
-                    </span>
-                    <span class="text-secondary text-small">
-                        {{ Auth::check() ? 'Developer' : 'Please Login' }}
                     </span>
                 </div>
                 <i class="menu-arrow"></i>
@@ -52,8 +53,8 @@
             <div class="collapse" id="ranking-menu">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item"> <a class="nav-link" href="#">Global</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Country</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Soon!</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Countries</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Clans</a></li>
                 </ul>
             </div>
         </li>

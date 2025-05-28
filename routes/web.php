@@ -17,8 +17,9 @@ use Illuminate\Support\Facades\Route;
 // USERS
 Route::get('/', [UserController::class, 'index']);
 
-// Route::post('/gnetot-upload', [UserController::class, 'gnetotUpload'])->name('gnetot-upload');
 Route::middleware(['web'])->group(function () {
+    Route::get('/register', [UserController::class, 'register'])->name('register');
+    Route::post('/register/process', [UserController::class, 'registerProcess'])->name('registerProcess');
     Route::get('/login', [UserController::class, 'login']);
     Route::post('/login/process', [UserController::class, 'loginProcess'])->name('loginProcess');
 });
@@ -27,7 +28,6 @@ Route::get('/u/{id}', [UserController::class, 'profile'])->name('profile');
 Route::get('/u/edit/{id}', [UserController::class, 'editProfile'])->name('editProfile');
 Route::post('/u/edit/process/{id}', [UserController::class, 'editProcess'])->name('editProcess');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
-// Route::get('/register', [UserController::class, 'register']); WIP
 
 // ADMIN(WIP)
 // Route::get('/admin/dashboard', [AdminController::class, 'index']);

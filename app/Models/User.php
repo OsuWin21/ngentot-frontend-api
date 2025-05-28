@@ -8,9 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Traits\HasPrivileges;
+
 class User extends Authenticatable
 {
     // use HasApiTokens, HasFactory, Notifiable;
+    use HasPrivileges;
 
     protected $table = 'users';
     public $timestamps = false;
@@ -22,8 +25,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        // 'email',
+        'email',
+        'priv',
         'pw_bcrypt',
+        'country'
     ];
 
     /**
@@ -43,6 +48,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         // 'email_verified_at' => 'datetime',
+        'privileges' => 'integer',
         'pw_bcrypt' => 'hashed',
     ];
 

@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>osu!Ngentot - Edit Profile</title>
+    <title>osu!win21 - Edit Profile</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="{{ asset('assets/user/vendors/mdi/css/materialdesignicons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/user/vendors/css/vendor.bundle.base.css') }}">
@@ -140,7 +140,7 @@
                                                     <label for="userpageContent">
                                                         About Me!
                                                         <a class="link link-primary"
-                                                            href="https://www.markdownguide.org/basic-syntax/#html">BB Code Syntax</a>
+                                                            href="https://www.markdownguide.org/basic-syntax/#html">Markdown Syntax</a>
                                                         </label>
                                                     <textarea class="form-control" id="userpageContent" rows="4" name="userpage-content">{{ $user->userpage_content }}</textarea>
                                                 </div>
@@ -189,6 +189,7 @@
     <script src="{{ asset('assets/user/js/todolist.js') }}"></script>
     <!-- End custom js for this page -->
 
+    <!-- Cropper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/2.0.0-alpha.2/cropper.min.js"
         integrity="sha512-IlZV3863HqEgMeFLVllRjbNOoh8uVj0kgx0aYxgt4rdBABTZCl/h5MfshHD9BrnVs6Rs9yNN7kUQpzhcLkNmHw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>

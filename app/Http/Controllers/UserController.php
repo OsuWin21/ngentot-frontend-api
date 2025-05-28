@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Log;
 
 
 class UserController extends Controller
@@ -19,6 +21,84 @@ class UserController extends Controller
     public function index()
     {
         return redirect('/u/4');
+    }
+
+    public function register()
+    {
+        if (!auth()->check()) {
+            return view('user.register');
+        } else {
+            return redirect('/u/' . Auth::user()->id)->with('error', 'You are already logged in.');
+        }
+    }
+
+    public function registerProcess(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:15',
+            'email' => 'required|string|email|max:255',
+            'pw_bcrypt' => 'required|string|min:8|max:32'
+        ]);
+
+        // Cek apakah username sudah terdaftar
+        if (User::where('name', $request->input('username'))->exists()) {
+            return redirect()->back()->withInput()->with('error', 'Username Existed.');
+        }
+
+        // Cek apakah email sudah terdaftar
+        if (User::where('email', $request->input('email'))->exists()) {
+            return redirect()->back()->withInput()->with('error', 'Email Existed.');
+        }
+
+        $countryCode = $this->detectCountryFromIP();
+
+        $user = new User();
+        $user->name = $request->input('username');
+        $user->safe_name = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $request->input('username')));
+        $user->email = $request->input('email');
+        $user->priv = User::UNRESTRICTED;
+        $user->pw_bcrypt = Hash::make(md5($request->input('pw_bcrypt')), ['rounds' => 12]);
+        $user->country = strtolower($countryCode) ?: $request->input('country', 'id');
+        $user->silence_end = 0;
+        $user->donor_end = 0;
+        $user->creation_time = Carbon::now()->timestamp;
+        $user->latest_activity = Carbon::now()->timestamp;
+        $user->clan_id = 0;
+        $user->clan_priv = 0;
+        $user->preferred_mode = 0;
+        $user->play_style = 0;
+
+        $user->save();
+
+        Auth::login($user);
+
+        $stats = [];
+        $userId = Auth::user()->id;
+
+        foreach ([0, 1, 2, 3, 4, 5, 6, 8] as $mode) {
+            $stats[] = [
+                'id' => $userId,
+                'mode' => $mode,
+                'tscore' => 0,
+                'rscore' => 0,
+                'pp' => 0,
+                'plays' => 0,
+                'playtime' => 0,
+                'acc' => 0,
+                'max_combo' => 0,
+                'total_hits' => 0,
+                'replay_views' => 0,
+                'xh_count' => 0,
+                'x_count' => 0,
+                'sh_count' => 0,
+                's_count' => 0,
+                'a_count' => 0
+            ];
+        }
+
+        DB::table('stats')->insert($stats);
+
+        return redirect('/u/' . Auth::user()->id)->with('success', 'Registration successful!');
     }
 
     public function login()
@@ -103,20 +183,22 @@ class UserController extends Controller
                 ->first();
 
             $countryCode = DB::table('users')->where('id', $id)->value('country');
-            $globalRank = DB::table('stats')
-                ->where('mode', $combinedMode)
-                ->where('pp', '>', $userProfile->PP ?? 0)
-                ->count() + 1;
+            if (($userProfile->PP ?? 0) > 0) {
+                $globalRank = DB::table('stats')
+                    ->where('mode', $combinedMode)
+                    ->where('pp', '>', $userProfile->PP ?? 0)
+                    ->count() + 1;
 
-            $countryRank = DB::table('stats')
-                ->join('users', 'users.id', '=', 'stats.id')
-                ->where('stats.mode', $combinedMode)
-                ->where('users.country', $countryCode)
-                ->where('stats.pp', '>', $userProfile->PP ?? 0)
-                ->count() + 1;
-
-            $userProfile->{'Global Rank'} = $globalRank;
-            $userProfile->{'Country Rank'} = $countryRank;
+                $countryRank = DB::table('stats')
+                    ->join('users', 'users.id', '=', 'stats.id')
+                    ->where('stats.mode', $combinedMode)
+                    ->where('users.country', $countryCode)
+                    ->where('stats.pp', '>', $userProfile->PP ?? 0)
+                    ->count() + 1;
+            } else {
+                $globalRank = 0;
+                $countryRank = 0;
+            }
 
             # Get the user's first place scores
             if ($rx != 0) {
@@ -428,5 +510,27 @@ class UserController extends Controller
         }
 
         return "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/{$first}-{$second}.svg";
+    }
+
+    private function detectCountryFromIP()
+    {
+        try {
+            $clientIP = request()->ip();
+
+            // Untuk development, gunakan IP publik jika di localhost
+            if ($clientIP === '127.0.0.1' || $clientIP === '::1') {
+                $clientIP = Http::get('https://api.ipify.org')->body();
+            }
+
+            $response = Http::get("http://ip-api.com/json/{$clientIP}?fields=countryCode");
+
+            if ($response->successful()) {
+                return $response->json()['countryCode'] ?? null;
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to detect country from IP: " . $e->getMessage());
+        }
+
+        return null;
     }
 }

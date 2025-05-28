@@ -144,7 +144,8 @@
                                 <h4 class="text-muted">Global Rank</h4>
                                 <h5>#{{ $global_rank }}</h5>
                             @else
-                                Unranked
+                                <h4 class="text-muted">Global Rank</h4>
+                                -
                             @endif
                         </div>
                         <div class="col-6 text-center p-1 border-bottom">
@@ -152,7 +153,8 @@
                                 <h4 class="text-muted">Country Rank</h4>
                                 <h5>#{{ $country_rank }}</h5>
                             @else
-                                Unranked
+                                <h4 class="text-muted">Country Rank</h4>
+                                -
                             @endif
                         </div>
 
