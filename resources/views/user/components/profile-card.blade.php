@@ -134,7 +134,7 @@
 {{ $user->userpage_content }}
 @endmarkdown
             </div>
-            <div class="col-sm-4 overflow-auto">
+            <div class="col-sm-5 overflow-auto">
                 <div class="card-body py-0">
                     <h5 class="card-title">Player Stats</h5>
                     <div class="row g-0">
