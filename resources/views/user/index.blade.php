@@ -87,7 +87,7 @@
                                 </div>
                                 <div class="stat-content">
                                     <h4>Standard Relax PP Record</h4>
-                                    <p class="mb-0">{{ number_format($rx_record->pp, 0) }}pp by <a class="link link-primary" href="u/{{ $rx_record->id }}">{{ $rx_record->name }}</a></p>
+                                    <p class="mb-0">{{ number_format($rx_record->pp, 0) }}pp by <a class="link link-primary" href="u/{{ $rx_record->id }}?mode=0&rx=4">{{ $rx_record->name }}</a></p>
                                 </div>
                             </div>
                         </div>
@@ -98,7 +98,7 @@
                                 </div>
                                 <div class="stat-content">
                                     <h4>Standard AutoPilot PP Record</h4>
-                                    <p class="mb-0">{{ number_format($ap_record->pp, 0) }}pp by <a class="link link-primary" href="u/{{ $ap_record->id }}">{{ $ap_record->name }}</a></p>
+                                    <p class="mb-0">{{ number_format($ap_record->pp, 0) }}pp by <a class="link link-primary" href="u/{{ $ap_record->id }}?mode=0&rx=8">{{ $ap_record->name }}</a></p>
                                 </div>
                             </div>
                         </div>
