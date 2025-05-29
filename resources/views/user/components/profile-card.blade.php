@@ -4,7 +4,7 @@
             <div class="col px-0">
                 <div class="card-profile-bg position-relative rounded-top"
                     style="background-image: url('{{ Storage::disk('public')->exists("/backgrounds/$user->id.png") ? asset("storage/backgrounds/$user->id.png") : asset('storage/backgrounds/default.png') }}');">
-                    @if (Auth::user()->id == $user->id)
+                    @if (Auth::user()->id ?? (0 == $user->id ?? 0))
                         <span
                             class="bg-gradient-primary text-white me-2 position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center rounded-circle">
                             <a href="/u/edit/{{ $user->id }}" class="text-light"><i class="mdi mdi-pencil"></i></a>
@@ -137,28 +137,72 @@
             <div class="col-sm-5 overflow-auto">
                 <div class="card-body py-0">
                     <h5 class="card-title">Player Stats</h5>
-                    <div class="row g-0">
-                        <!-- Header -->
-                        <div class="col-6 text-center p-1 border-bottom">
-                            @if ($global_rank > 0)
-                                <h4 class="text-muted">Global Rank</h4>
-                                <h5>#{{ $global_rank }}</h5>
-                            @else
-                                <h4 class="text-muted">Global Rank</h4>
+                    <div class="row g-0 border-bottom pb-3 pt-2 justify-content-evenly">
+                        @if ($global_rank == 1)
+                            <div
+                                class="btn btn-yellow d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Global Rank</h5>
+                                <h4 class="mb-0">#{{ $global_rank }}</h4>
+                            </div>
+                        @elseif($global_rank == 2)
+                            <div
+                                class="btn btn-gray d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Global Rank</h5>
+                                <h4 class="mb-0">#{{ $global_rank }}</h4>
+                            </div>
+                        @elseif($global_rank == 3)
+                            <div
+                                class="btn btn-bronze d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Global Rank</h5>
+                                <h4 class="mb-0">#{{ $global_rank }}</h4>
+                            </div>
+                        @elseif($global_rank > 3)
+                            <div
+                                class="btn d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Global Rank</h5>
+                                <h4 class="mb-0">#{{ $global_rank }}</h4>
+                            </div>
+                        @else
+                            <div
+                                class="btn d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Global Rank</h5>
                                 -
-                            @endif
-                        </div>
-                        <div class="col-6 text-center p-1 border-bottom">
-                            @if ($country_rank > 0)
-                                <h4 class="text-muted">Country Rank</h4>
-                                <h5>#{{ $country_rank }}</h5>
-                            @else
-                                <h4 class="text-muted">Country Rank</h4>
-                                -
-                            @endif
-                        </div>
+                            </div>
+                        @endif
 
-                        <!-- Body -->
+                        @if ($country_rank == 1)
+                            <div
+                                class="btn btn-yellow d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Country Rank</h5>
+                                <h4 class="mb-0">#{{ $country_rank }}</h4>
+                            </div>
+                        @elseif($country_rank == 2)
+                            <div
+                                class="btn btn-gray d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Country Rank</h5>
+                                <h4 class="mb-0">#{{ $country_rank }}</h4>
+                            </div>
+                        @elseif($country_rank == 3)
+                            <div
+                                class="btn btn-bronze d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Country Rank</h5>
+                                <h4 class="mb-0">#{{ $country_rank }}</h4>
+                            </div>
+                        @elseif($country_rank > 3)
+                            <div
+                                class="btn d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Country Rank</h5>
+                                <h4 class="mb-0">#{{ $country_rank }}</h4>
+                            </div>
+                        @else
+                            <div
+                                class="btn d-flex flex-column col-5 text-center py-1 px-0 justify-content-center align-items-center gap-1">
+                                <h5 class="mb-0">Country Rank</h5>
+                                -
+                            </div>
+                        @endif
+                    </div>
+                    <div class="row g-0">
                         @foreach ((array) $user_profile as $key => $value)
                             <div class="col-6 p-1">{{ $key }}</div>
                             <div class="col-6 p-1">

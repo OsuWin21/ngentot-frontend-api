@@ -13,7 +13,7 @@ function closeAlphaAlert() {
 window.addEventListener('DOMContentLoaded', function () {
     const closedAt = localStorage.getItem('alphaAlertClosedAt');
     const now = Date.now();
-    if (!closedAt || now - closedAt > 300000) {
+    if (!closedAt || now - closedAt > 600000) {
         document.getElementById('alphaAlert').style.display = '';
     }
 });

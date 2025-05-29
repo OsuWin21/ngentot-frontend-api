@@ -20,7 +20,47 @@ class UserController extends Controller
 {
     public function index()
     {
-        return redirect('/u/4');
+        $user = User::orderBy('id', 'desc')->take(5)->get();
+        $userCount = User::count();
+        $userCount -= 5;
+
+        $vnRecord = DB::table('scores')
+            ->join('users', 'scores.userid', '=', 'users.id')
+            ->join('maps', 'scores.map_md5', '=', 'maps.md5')
+            ->select('users.id', 'users.name', 'scores.pp')
+            ->orderBy('scores.pp','desc')
+            ->where('scores.mode', 0)
+            ->where('maps.status', 2)
+            ->where('scores.status', 2)
+            ->first();
+
+        $rxRecord = DB::table('scores')
+            ->join('users', 'scores.userid', '=', 'users.id')
+            ->join('maps', 'scores.map_md5', '=', 'maps.md5')
+            ->select('users.id', 'users.name', 'scores.pp')
+            ->orderBy('scores.pp','desc')
+            ->where('scores.mode', 4)
+            ->where('maps.status', 2)
+            ->where('scores.status', 2)
+            ->first();
+
+        $apRecord = DB::table('scores')
+            ->join('users', 'scores.userid', '=', 'users.id')
+            ->join('maps', 'scores.map_md5', '=', 'maps.md5')
+            ->select('users.id', 'users.name', 'scores.pp')
+            ->orderBy('scores.pp','desc')
+            ->where('scores.mode', 8)
+            ->where('maps.status', 2)
+            ->where('scores.status', 2)
+            ->first();
+
+        return view('user.index', [
+            'user' => $user,
+            'user_count' => $userCount,
+            'vn_record' => $vnRecord,
+            'rx_record' => $rxRecord,
+            'ap_record' => $apRecord
+        ]);
     }
 
     public function register()

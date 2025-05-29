@@ -136,7 +136,7 @@ cropButton.addEventListener('click', async (e) => {
                     if (data.background) {
                         document.querySelectorAll('.user-background').forEach(img => img.src = data.background + '?t=' + Date.now());
                     }
-                    alert('Update Successful!');
+                    alert('Update Successful! Press CTRL + F5 to See Changes');
                     window.location.href = window.location.pathname + '?t=' + new Date().getTime();
                 } else {
                     throw new Error(data.error || 'Unknown error');

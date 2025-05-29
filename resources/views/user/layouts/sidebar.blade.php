@@ -41,7 +41,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="/">
                 <span class="menu-title">Home</span>
                 <i class="mdi mdi-home menu-icon"></i>
             </a>
@@ -51,11 +51,12 @@
                 aria-controls="ranking-menu">
                 <span class="menu-title">Rankings</span>
                 <i class="menu-arrow"></i>
-                <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                <i class="mdi mdi-chart-bar menu-icon"></i>
             </a>
             <div class="collapse" id="ranking-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="#">Global</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Performance</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Score</a></li>
                     <li class="nav-item"> <a class="nav-link" href="#">Countries</a></li>
                     <li class="nav-item"> <a class="nav-link" href="#">Clans</a></li>
                 </ul>
