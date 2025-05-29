@@ -54,7 +54,7 @@
                                         class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
                                         type="submit">SIGN UP</button>
                                 </div>
-                                <div class="text-center mt-4 font-weight-light">Already have an account? <br>Yoooo stop multi-accounting dawg, go <a href="login.html" class="link link-primary">Sign In</a> or Perma'd</div>
+                                <div class="text-center mt-4 font-weight-light">Already have an account? <br>Yoooo stop multi-accounting dawg, go <a href="{{ route('login')}}" class="link link-primary">Sign In</a> or Perma'd</div>
                             </form>
                         </div>
                     </div>
