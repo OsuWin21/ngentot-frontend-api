@@ -22,12 +22,16 @@ Route::middleware(['web'])->group(function () {
     Route::post('/register/process', [UserController::class, 'registerProcess'])->name('registerProcess');
     Route::get('/login', [UserController::class, 'login'])->name('login');
     Route::post('/login/process', [UserController::class, 'loginProcess'])->name('loginProcess');
+    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 });
 
-Route::get('/u/{id}', [UserController::class, 'profile'])->name('profile');
-Route::get('/u/edit/{id}', [UserController::class, 'editProfile'])->name('editProfile');
-Route::post('/u/edit/process/{id}', [UserController::class, 'editProcess'])->name('editProcess');
-Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+Route::get('/leaderboard', [UserController::class, 'leaderboard'])->name('leaderboard');
+
+Route::prefix('u')->group(function () {
+    Route::get('/{id}', [UserController::class, 'profile'])->name('profile');
+    Route::get('/edit/{id}', [UserController::class, 'editProfile'])->name('editProfile');
+    Route::post('/edit/process/{id}', [UserController::class, 'editProcess'])->name('editProcess');
+});
 
 // ADMIN(WIP)
 // Route::get('/admin/dashboard', [AdminController::class, 'index']);

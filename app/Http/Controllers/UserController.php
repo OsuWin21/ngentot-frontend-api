@@ -28,7 +28,7 @@ class UserController extends Controller
             ->join('users', 'scores.userid', '=', 'users.id')
             ->join('maps', 'scores.map_md5', '=', 'maps.md5')
             ->select('users.id', 'users.name', 'scores.pp')
-            ->orderBy('scores.pp','desc')
+            ->orderBy('scores.pp', 'desc')
             ->where('scores.mode', 0)
             ->where('maps.status', 2)
             ->where('scores.status', 2)
@@ -38,7 +38,7 @@ class UserController extends Controller
             ->join('users', 'scores.userid', '=', 'users.id')
             ->join('maps', 'scores.map_md5', '=', 'maps.md5')
             ->select('users.id', 'users.name', 'scores.pp')
-            ->orderBy('scores.pp','desc')
+            ->orderBy('scores.pp', 'desc')
             ->where('scores.mode', 4)
             ->where('maps.status', 2)
             ->where('scores.status', 2)
@@ -48,7 +48,7 @@ class UserController extends Controller
             ->join('users', 'scores.userid', '=', 'users.id')
             ->join('maps', 'scores.map_md5', '=', 'maps.md5')
             ->select('users.id', 'users.name', 'scores.pp')
-            ->orderBy('scores.pp','desc')
+            ->orderBy('scores.pp', 'desc')
             ->where('scores.mode', 8)
             ->where('maps.status', 2)
             ->where('scores.status', 2)
@@ -176,10 +176,44 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'You have been logged out successfully.');
     }
 
-    public function gnetotUpload(Request $request)
+    public function leaderboard(request $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        $mode = $request->input('mode', 0);
+        $rx = $request->input('rx', 0);
+
+        $leaderboard = DB::table('stats')
+            ->join('users', 'stats.id', '=', 'users.id')
+            ->select(
+            'users.id',
+            'users.name',
+            'users.country',
+            'stats.acc as Accuracy',
+            'stats.plays as Play_Count',
+            'stats.rscore as Ranked_Score',
+            'stats.pp as Performance',
+            DB::raw('(stats.xh_count + stats.x_count) as SS'),
+            DB::raw('(stats.sh_count + stats.s_count) as S'),
+            'stats.a_count as A'
+            )
+            ->where('stats.mode', $rx + $mode)
+            ->where('stats.pp', '!=', 0)
+            ->orderByDesc('stats.pp')
+            ->take(50)
+            ->get();
+
+        $leaderboard->transform(function ($item, $key) {
+            $item->rank = $key + 1;
+            if ($item->country) {
+                $item->flag_url = $this->getTwemojiFlagUrl($item->country);
+                $item->country_name = country($item->country)->getOfficialName();
+            }
+            return $item;
+        });
+
+        return view('user.leaderboard', [
+            'mode' => $mode,
+            'rx' => $rx,
+            'leaderboard' => $leaderboard
         ]);
     }
 
