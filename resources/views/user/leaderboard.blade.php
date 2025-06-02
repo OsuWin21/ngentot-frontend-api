@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    @include('user.layouts.error')
+    @include('user.layouts.alerts')
     <div class="container-fluid p-0">
         @include('user.layouts.navbar')
         <div class=" page-body-wrapper">

@@ -5,8 +5,8 @@
                 aria-controls="profile-menu">
                 <div class="nav-profile-image">
                     @if (Auth::check())
-                    <img src="{{ Storage::disk('public')->exists('avatars/' . Auth::user()->id . '.png') ? asset('storage/avatars/' . Auth::user()->id . '.png') : asset('storage/avatars/default.png') }}"
-                        alt="profile">
+                        <img src="{{ Storage::disk('public')->exists('avatars/' . Auth::user()->id . '.png') ? asset('storage/avatars/' . Auth::user()->id . '.png') : asset('storage/avatars/default.png') }}"
+                            alt="profile">
                     @else
                         <img src="{{ asset('storage/avatars/default.png') }}" alt="profile">
                     @endif
@@ -23,7 +23,16 @@
                 <ul class="nav flex-column sub-menu">
                     @if (Auth::check())
                         <li class="nav-item">
-                            <a class="nav-link" href="/u/{{ Auth::user()->id }}">My Profile</a>
+                            <a class="nav-link {{ request()->path() == 'u/' . Auth::user()->id ? 'active' : '' }}"
+                                href="/u/{{ Auth::user()->id }}">My Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->path() == 'u/edit/' . Auth::user()->id ? 'active' : '' }}"
+                                href="/u/edit/{{ Auth::user()->id }}">Edit Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->path() == 'u/invites/' . Auth::user()->id ? 'active' : '' }}"
+                                href="/u/invites/{{ Auth::user()->id }}">Invite Codes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('logout') }}">Sign Out</a>
@@ -55,7 +64,8 @@
             </a>
             <div class="collapse" id="ranking-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="/leaderboard?mode=0&rx=8&sort=pp">Performance</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="/leaderboard?mode=0&rx=8&sort=pp">Performance</a>
+                    </li>
                     <li class="nav-item"> <a class="nav-link" href="#">Score</a></li>
                     <li class="nav-item"> <a class="nav-link" href="#">Countries</a></li>
                     <li class="nav-item"> <a class="nav-link" href="#">Clans</a></li>

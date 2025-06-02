@@ -16,12 +16,14 @@
 </head>
 
 <body>
+    @include('user.layouts.alerts')
     <div class="container-scroller">
-        @include('user.layouts.error')
+        @include('user.layouts.navbar')
         <div class="container-fluid page-body-wrapper full-page-wrapper">
+            @include('user.layouts.sidebar')
             <div class="content-wrapper d-flex align-items-center auth">
                 <div class="row flex-grow">
-                    <div class="col-lg-4 mx-auto">
+                    <div class="col-lg-5 mx-auto">
                         <div class="auth-form-light text-left p-5">
                             <div class="brand-logo">
                                 <img
@@ -42,6 +44,10 @@
                                 <div class="form-group">
                                     <input type="password" class="form-control form-control-lg" id="password"
                                         name="pw_bcrypt" placeholder="Password" minlength="8" maxlength="32" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-lg" id="invite_code"
+                                        name="invite_code" placeholder="Invite Code" required>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="form-check">

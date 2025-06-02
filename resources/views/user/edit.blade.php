@@ -26,6 +26,7 @@
 </head>
 
 <body>
+    @include('user.layouts.alerts')
     <div class="container-fluid p-0">
         <!-- partial:partials/_navbar.html -->
         @include('user.layouts.navbar')
@@ -160,10 +161,7 @@
                 </div>
             </div>
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
         @include('user.layouts.footer')
-        <!-- partial -->
     </div>
     <!-- main-panel ends -->
 

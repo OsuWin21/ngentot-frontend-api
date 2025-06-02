@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Log;
 
-
 class UserController extends Controller
 {
     public function index()
@@ -77,19 +76,23 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|string|max:15',
             'email' => 'required|string|email|max:255',
-            'pw_bcrypt' => 'required|string|min:8|max:32'
+            'pw_bcrypt' => 'required|string|min:8|max:32',
+            'invite_code' => 'required|string|exists:invites,invite_code'
         ]);
 
-        // Cek apakah username sudah terdaftar
         if (User::where('name', $request->input('username'))->exists()) {
             return redirect()->back()->withInput()->with('error', 'Username Existed.');
         }
-
-        // Cek apakah email sudah terdaftar
         if (User::where('email', $request->input('email'))->exists()) {
             return redirect()->back()->withInput()->with('error', 'Email Existed.');
         }
 
+        $inviteUsed = DB::table('invite_usage')->where('invite_code', $request->invite_code)->exists();
+        if ($inviteUsed) {
+            return redirect()->back()->withInput()->with('error', 'Invite code already used.');
+        }
+
+        // Proses pendaftaran user
         $countryCode = $this->detectCountryFromIP();
 
         $user = new User();
@@ -107,8 +110,21 @@ class UserController extends Controller
         $user->clan_priv = 0;
         $user->preferred_mode = 0;
         $user->play_style = 0;
-
         $user->save();
+
+        DB::table('invite_usage')->insert([
+            'invite_code' => $request->invite_code,
+            'code_user' => $user->id,
+            'used_at' => now(),
+        ]);
+
+        for ($i = 0; $i < 4; $i++) {
+            DB::table('invites')->insert([
+                'invite_code' => strtoupper(bin2hex(random_bytes(4))),
+                'userid' => $user->id,
+                'created_at' => now(),
+            ]);
+        }
 
         Auth::login($user);
 
@@ -157,9 +173,6 @@ class UserController extends Controller
             'pw_bcrypt' => md5($request->input('pw_bcrypt'))
         ];
 
-        $hash = DB::table('users')->select('pw_bcrypt')
-            ->where('name', $data['name'])
-            ->first();
         $user = User::where('name', $data['name'])->first();
 
         if ($user && password_verify($data['pw_bcrypt'], $user->pw_bcrypt)) {
@@ -172,7 +185,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        Auth::logout(); // Logout the user
+        Auth::logout();
         return redirect()->back()->with('success', 'You have been logged out successfully.');
     }
 
@@ -184,16 +197,16 @@ class UserController extends Controller
         $leaderboard = DB::table('stats')
             ->join('users', 'stats.id', '=', 'users.id')
             ->select(
-            'users.id',
-            'users.name',
-            'users.country',
-            'stats.acc as Accuracy',
-            'stats.plays as Play_Count',
-            'stats.rscore as Ranked_Score',
-            'stats.pp as Performance',
-            DB::raw('(stats.xh_count + stats.x_count) as SS'),
-            DB::raw('(stats.sh_count + stats.s_count) as S'),
-            'stats.a_count as A'
+                'users.id',
+                'users.name',
+                'users.country',
+                'stats.acc as Accuracy',
+                'stats.plays as Play_Count',
+                'stats.rscore as Ranked_Score',
+                'stats.pp as Performance',
+                DB::raw('(stats.xh_count + stats.x_count) as SS'),
+                DB::raw('(stats.sh_count + stats.s_count) as S'),
+                'stats.a_count as A'
             )
             ->where('stats.mode', $rx + $mode)
             ->where('stats.pp', '!=', 0)
@@ -480,6 +493,53 @@ class UserController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function invites($id) {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect('/login')->with('error', 'You must be logged in to view your invites.');
+        }
+         
+        if($user->id != $id) {
+            return redirect()->back()->with('error', "You don't have access to other people's invites.");
+        }
+        // Ambil semua undangan milik user
+        $invites = DB::table('invites')
+            ->where('userid', $user->id)
+            ->get();
+        
+        // Ambil semua kode undangan yang sudah digunakan beserta user yang menggunakannya dan waktu digunakan
+        $usedInvites = DB::table('invite_usage')
+            ->pluck('code_user', 'invite_code')
+            ->toArray();
+
+        $usedAt = DB::table('invite_usage')
+            ->pluck('used_at', 'invite_code')
+            ->toArray();
+
+        // Ambil data user yang menggunakan invite (jika ada)
+        $usedUserIds = array_values($usedInvites);
+        $usedUsers = [];
+        if (!empty($usedUserIds)) {
+            $usedUsers = User::whereIn('id', $usedUserIds)
+            ->pluck('name', 'id')
+            ->toArray();
+        }
+
+        // Tandai setiap undangan apakah sudah digunakan, oleh siapa, kapan, dan id user yang menggunakan
+        $invites->transform(function ($invite) use ($usedInvites, $usedUsers, $usedAt) {
+            $invite->used = array_key_exists($invite->invite_code, $usedInvites);
+            $invite->used_by = $invite->used ? ($usedUsers[$usedInvites[$invite->invite_code]] ?? null) : null;
+            $invite->used_at = $invite->used ? ($usedAt[$invite->invite_code] ?? null) : null;
+            $invite->used_by_id = $invite->used ? ($usedInvites[$invite->invite_code] ?? null) : null;
+            return $invite;
+        });
+
+        return view('user.invites', [
+            'invites' => $invites
+        ]);
     }
 
     private function decodeMods($modsValue)

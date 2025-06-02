@@ -2,18 +2,32 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
 use App\Traits\HasPrivileges;
 
 class User extends Authenticatable
 {
-    // use HasApiTokens, HasFactory, Notifiable;
-    use HasPrivileges;
+    use HasApiTokens, HasFactory, Notifiable, HasPrivileges;
+    
+    // Privilege Constants
+    const UNRESTRICTED    = 1 << 0;   // is an unbanned player.
+    const VERIFIED        = 1 << 1;   // has logged in to the server in-game.
+    const WHITELISTED     = 1 << 2;   // bypass anti-cheat.
+    const SUPPORTER       = 1 << 4;   // donator tier.
+    const PREMIUM         = 1 << 5;   // donator tier.
+    const ALUMNI          = 1 << 7;   // notable users.
+    const TOURNEY_MANAGER = 1 << 10;  // manage match state without host.
+    const NOMINATOR       = 1 << 11;  // manage maps ranked status.
+    const MODERATOR       = 1 << 12;  // manage users (level 1).
+    const ADMINISTRATOR   = 1 << 13;  // manage users (level 2).
+    const DEVELOPER       = 1 << 14;  // manage full server state.
+
+    // Combined Privileges
+    const DONATOR = self::SUPPORTER | self::PREMIUM;
+    const STAFF = self::MODERATOR | self::ADMINISTRATOR | self::DEVELOPER;
 
     protected $table = 'users';
     public $timestamps = false;
@@ -26,7 +40,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'priv',
+        'priv', // atau 'privileges' tergantung nama kolom di database
         'pw_bcrypt',
         'country'
     ];
@@ -38,7 +52,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'pw_bcrypt',
-        // 'remember_token',
     ];
 
     /**
@@ -47,9 +60,21 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        // 'email_verified_at' => 'datetime',
-        'privileges' => 'integer',
+        'priv' => 'integer', // atau 'privileges' tergantung nama kolom
         'pw_bcrypt' => 'hashed',
     ];
 
+    /**
+     * Untuk kompatibilitas dengan trait HasPrivileges
+     * Jika kolom di database bernama 'priv' tapi trait menggunakan 'privileges'
+     */
+    public function getPrivilegesAttribute()
+    {
+        return $this->priv;
+    }
+
+    public function setPrivilegesAttribute($value)
+    {
+        $this->attributes['priv'] = $value;
+    }
 }

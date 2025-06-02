@@ -4,7 +4,7 @@
             <div class="col px-0">
                 <div class="card-profile-bg position-relative rounded-top"
                     style="background-image: url('{{ Storage::disk('public')->exists("/backgrounds/$user->id.png") ? asset("storage/backgrounds/$user->id.png") : asset('storage/backgrounds/default.png') }}');">
-                    @if (Auth::user()->id ?? (0 == $user->id ?? 0))
+                    @if (optional(Auth::user())->id == $user->id)
                         <span
                             class="bg-gradient-primary text-white me-2 position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center rounded-circle">
                             <a href="/u/edit/{{ $user->id }}" class="text-light"><i class="mdi mdi-pencil"></i></a>

@@ -16,13 +16,14 @@
 </head>
 
 <body>
-
+    @include('user.layouts.alerts')
     <div class="container-scroller">
-        @include('user.layouts.error')
+        @include('user.layouts.navbar')
         <div class="container-fluid page-body-wrapper full-page-wrapper">
+            @include('user.layouts.sidebar')
             <div class="content-wrapper d-flex align-items-center auth">
                 <div class="row flex-grow">
-                    <div class="col-lg-4 mx-auto">
+                    <div class="col-lg-5 mx-auto">
                         <div class="auth-form-light text-left p-5">
                             <div class="brand-logo">
                                 <img

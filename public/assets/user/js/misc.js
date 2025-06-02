@@ -11,115 +11,79 @@ var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
 (function ($) {
   'use strict';
   $(function () {
-    var body = $('body');
-    var contentWrapper = $('.content-wrapper');
-    var scroller = $('.container-scroller');
-    var footer = $('.footer');
-    var sidebar = $('.sidebar');
-
-    //Add active class to nav-link based on url dynamically
-    //Active class can be hard coded directly in html file also as required
+    const body = $('body');
+    const sidebar = $('.sidebar');
+    const currentPath = location.pathname;
 
     function addActiveClass(element) {
-      if (current === "") {
-        //for root url
-        if (element.attr('href').indexOf("index.html") !== -1) {
-          element.parents('.nav-item').last().addClass('active');
-          if (element.parents('.sub-menu').length) {
-            element.closest('.collapse').addClass('show');
-            element.addClass('active');
-          }
-        }
-      } else {
-        //for other url
-        if (element.attr('href').indexOf(current) !== -1) {
-          element.parents('.nav-item').last().addClass('active');
-          if (element.parents('.sub-menu').length) {
-            element.closest('.collapse').addClass('show');
-            element.addClass('active');
-          }
-          if (element.parents('.submenu-item').length) {
-            element.addClass('active');
-          }
-        }
+      const href = element.attr('href');
+      if (!href || href === '#') return;
+
+      const fullUrl = new URL(href, location.origin);
+      if (fullUrl.pathname === currentPath) {
+        element.addClass('active');
+        element.parents('.nav-item').addClass('active');
+        element.closest('.collapse').addClass('show');
       }
     }
 
-    var current = location.pathname.split("/").slice(-1)[0].replace(/^\/|\/$/g, '');
-    $('.nav li a', sidebar).each(function () {
-      var $this = $(this);
-      addActiveClass($this);
-    })
-
+    // Terapkan active class ke sidebar dan horizontal menu
+    sidebar.find('.nav li a').each(function () {
+      addActiveClass($(this));
+    });
     $('.horizontal-menu .nav li a').each(function () {
-      var $this = $(this);
-      addActiveClass($this);
-    })
+      addActiveClass($(this));
+    });
 
-    //Close other submenu in sidebar on opening any
+    // Auto-open Profile Menu jika URL cocok
+    if (/^u(\/(edit|invites))?\/\d+$/.test(currentPath)) {
+      const $profileMenu = $('#profile-menu');
+      $profileMenu.addClass('show');
+      $profileMenu.prev('.nav-link').attr('aria-expanded', 'true');
+    }
 
+    // Sidebar hanya boleh satu menu terbuka
     sidebar.on('show.bs.collapse', '.collapse', function () {
-      sidebar.find('.collapse.show').collapse('hide');
+      sidebar.find('.collapse.show').not(this).collapse('hide');
     });
 
-
-    //Change sidebar and content-wrapper height
-    applyStyles();
-
-    function applyStyles() {
-      //Applying perfect scrollbar
-      if (!body.hasClass("rtl")) {
-        if (body.hasClass("sidebar-fixed")) {
-          var fixedSidebarScroll = new PerfectScrollbar('#sidebar .nav');
-        }
-      }
+    // Terapkan perfect-scrollbar untuk sidebar tetap
+    if (!body.hasClass("rtl") && body.hasClass("sidebar-fixed")) {
+      new PerfectScrollbar('#sidebar .nav');
     }
 
+    // Tombol minimize sidebar
     $('[data-toggle="minimize"]').on("click", function () {
-      if ((body.hasClass('sidebar-toggle-display')) || (body.hasClass('sidebar-absolute'))) {
-        body.toggleClass('sidebar-hidden');
+      body.toggleClass(body.hasClass('sidebar-toggle-display') || body.hasClass('sidebar-absolute')
+        ? 'sidebar-hidden'
+        : 'sidebar-icon-only');
+    });
+
+    // Checkbox & Radio visual helper
+    $(".form-check label, .form-radio label").append('<i class="input-helper"></i>');
+
+    // Tombol fullscreen
+    $("#fullscreen-button").on("click", function toggleFullScreen() {
+      const docEl = document.documentElement;
+      const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+      const cancelFullScreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitCancelFullScreen || document.msExitFullscreen;
+
+      if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        requestFullScreen?.call(docEl);
       } else {
-        body.toggleClass('sidebar-icon-only');
+        cancelFullScreen?.call(document);
       }
     });
 
-    //checkbox and radios
-    $(".form-check label,.form-radio label").append('<i class="input-helper"></i>');
-
-    //fullscreen
-    $("#fullscreen-button").on("click", function toggleFullScreen() {
-      if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) || (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) || (document.mozFullScreen !== undefined && !document.mozFullScreen) || (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
-        if (document.documentElement.requestFullScreen) {
-          document.documentElement.requestFullScreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-          document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullScreen) {
-          document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-        } else if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
-        }
-      } else {
-        if (document.cancelFullScreen) {
-          document.cancelFullScreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-          document.webkitCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-      }
-    })
-
-    if ($(".navbar").hasClass("fixed-top")) {
-      document.querySelector('.page-body-wrapper').classList.remove('pt-0');
-      document.querySelector('.navbar').classList.remove('pt-5');
-    }
-    else {
-      document.querySelector('.page-body-wrapper').classList.add('pt-0');
-      document.querySelector('.navbar').classList.add('pt-5');
-      document.querySelector('.navbar').classList.add('mt-3');
-
+    // Navbar padding fix
+    const pageWrapper = document.querySelector('.page-body-wrapper');
+    const navbar = document.querySelector('.navbar');
+    if (navbar.classList.contains("fixed-top")) {
+      pageWrapper.classList.remove('pt-0');
+      navbar.classList.remove('pt-5');
+    } else {
+      pageWrapper.classList.add('pt-0');
+      navbar.classList.add('pt-5', 'mt-3');
     }
   });
 })(jQuery);

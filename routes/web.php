@@ -31,6 +31,7 @@ Route::prefix('u')->group(function () {
     Route::get('/{id}', [UserController::class, 'profile'])->name('profile');
     Route::get('/edit/{id}', [UserController::class, 'editProfile'])->name('editProfile');
     Route::post('/edit/process/{id}', [UserController::class, 'editProcess'])->name('editProcess');
+    Route::get('/invites/{id}', [UserController::class, 'invites'])->name('invites');
 });
 
 // ADMIN(WIP)
