@@ -192,33 +192,24 @@ class UserController extends Controller
     public function leaderboard(request $request)
     {
         $mode = $request->input('mode', 0);
+        $sort = $request->input('sort', 0);
         $rx = $request->input('rx', 0);
 
-        $leaderboard = DB::table('stats')
-            ->join('users', 'stats.id', '=', 'users.id')
-            ->select(
-                'users.id',
-                'users.name',
-                'users.country',
-                'stats.acc as Accuracy',
-                'stats.plays as Play_Count',
-                'stats.rscore as Ranked_Score',
-                'stats.pp as Performance',
-                DB::raw('(stats.xh_count + stats.x_count) as SS'),
-                DB::raw('(stats.sh_count + stats.s_count) as S'),
-                'stats.a_count as A'
-            )
-            ->where('stats.mode', $rx + $mode)
-            ->where('stats.pp', '!=', 0)
-            ->orderByDesc('stats.pp')
-            ->take(50)
-            ->get();
+        $combinedMode = $mode + $rx;
 
-        $leaderboard->transform(function ($item, $key) {
-            $item->rank = $key + 1;
-            if ($item->country) {
-                $item->flag_url = $this->getTwemojiFlagUrl($item->country);
-                $item->country_name = country($item->country)->getOfficialName();
+        $apiUrl = env('API_OSU_URL') . "/v1/get_leaderboard?sort={$sort}&mode={$combinedMode}&limit=100&offset=0";
+        $response = Http::get($apiUrl);
+        if ($response->successful()) {
+            $leaderboard = $response->json()["leaderboard"];
+        } else {
+            $leaderboard = [];
+        }
+
+        $leaderboard = collect($leaderboard ?? [])->transform(function ($item, $key) {
+            $item['rank'] = $key + 1;
+            if (!empty($item['country'])) {
+                $item['flag_url'] = $this->getTwemojiFlagUrl($item['country']);
+                $item['country_name'] = country($item['country'])->getOfficialName();
             }
             return $item;
         });
@@ -226,6 +217,7 @@ class UserController extends Controller
         return view('user.leaderboard', [
             'mode' => $mode,
             'rx' => $rx,
+            'sort' => $sort,
             'leaderboard' => $leaderboard
         ]);
     }
@@ -250,37 +242,28 @@ class UserController extends Controller
             $combinedMode = $rx + $mode;
 
             # Get the user's Stats
-            $userProfile = DB::table('stats')
-                ->selectRaw('rscore AS `Ranked Score`,
-                            acc AS `Hit Accuracy`,
-                            plays AS `Play Count`,
-                            tscore AS `Total Score`,
-                            total_hits AS `Total Hits`,
-                            max_combo AS `Max Combo`,
-                            replay_views AS `Replays Watched by Others`,
-                            pp AS `PP`,
-                            playtime AS `Total Play Time`,
-                            xh_count AS `XH Count`,
-                            x_count AS `X Count`,
-                            sh_count AS `SH Count`,
-                            s_count AS `S Count`,
-                            a_count AS `A Count`')
-                ->where('id', $id)
-                ->where('mode', $combinedMode)
-                ->first();
+            $userProfileUrl = env('API_OSU_URL') . "/v2/players/{$id}/stats/{$combinedMode}";
+            $response = Http::get($userProfileUrl);
+            if ($response->successful()) {
+                $userProfile = $response->json()["data"];
+            } else {
+                $userProfile = [];
+            }
 
-            $countryCode = DB::table('users')->where('id', $id)->value('country');
-            if (($userProfile->PP ?? 0) > 0) {
+            $countryCode = $user->country ?? null;
+            $userPP = isset($userProfile['pp']) ? $userProfile['pp'] : 0;
+
+            if ($userPP > 0) {
                 $globalRank = DB::table('stats')
                     ->where('mode', $combinedMode)
-                    ->where('pp', '>', $userProfile->PP ?? 0)
+                    ->where('pp', '>', $userPP)
                     ->count() + 1;
 
                 $countryRank = DB::table('stats')
                     ->join('users', 'users.id', '=', 'stats.id')
                     ->where('stats.mode', $combinedMode)
                     ->where('users.country', $countryCode)
-                    ->where('stats.pp', '>', $userProfile->PP ?? 0)
+                    ->where('stats.pp', '>', $userPP)
                     ->count() + 1;
             } else {
                 $globalRank = 0;
@@ -378,42 +361,42 @@ class UserController extends Controller
             });
 
             # Get the user's top plays
-            $topPlays = DB::table('scores')
-                ->join('maps', 'scores.map_md5', '=', 'maps.md5')
-                ->select('scores.*', 'maps.id as map_id', 'maps.title as map_title', 'maps.artist as map_artist', 'maps.version as map_version', 'maps.status as map_status')
-                ->where('maps.status', '2')
-                ->where('scores.status', '2')
-                ->where('scores.mode', $rx + $mode)
-                ->where('scores.userid', $id)
-                ->orderBy('pp', 'desc')
-                ->take(10)
-                ->get()
-                ->map(function ($pp) {
-                    $pp->pp = (int)$pp->pp;
-                    return $pp;
-                });
-
+            $topPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=best&id={$id}&mode={$combinedMode}&limit=10&include_loved=false&include_failed=false";
+            $response = Http::get($topPlaysUrl);
+            if ($response->successful()) {
+                $topPlays = collect($response->json()["scores"] ?? []);
+            } else {
+                $topPlays = collect([]);
+            }
+            
             $topPlays->transform(function ($play) {
-                $play->mods_list = $this->decodeMods($play->mods);
+                $play['mods_list'] = $this->decodeMods($play['mods']);
                 return $play;
             });
 
             # Get the user's recent plays
-            $recentPlays = DB::table('scores')
-                ->join('maps', 'scores.map_md5', '=', 'maps.md5')
-                ->select('scores.*', 'maps.id as map_id', 'maps.title as map_title', 'maps.artist as map_artist', 'maps.version as map_version', 'maps.status as map_status')
-                ->where('userid', $id)
-                ->where('scores.mode', $rx + $mode)
-                ->where('scores.play_time', '>=', now()->subDay())
-                ->orderBy('play_time', 'desc')
-                ->take(10)
-                ->get()->map(function ($pp) {
-                    $pp->pp = (int)$pp->pp;
-                    return $pp;
-                });
+            $recentPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=recent&id={$id}&mode={$combinedMode}&limit=50&include_loved=true&include_failed=true";
+            $response = Http::get($recentPlaysUrl);
+            if ($response->successful()) {
+                $recentPlays = collect($response->json()["scores"] ?? []);
+            } else {
+                $recentPlays = collect([]);
+            }
+
+            // Filter hanya skor dalam 24 jam terakhir, lalu ambil 10 teratas
+            $recentPlays = $recentPlays->filter(function ($play) {
+                // play_time format: Y-m-d\TH:i:s (ISO 8601, e.g. 2025-06-02T07:19:48)
+                if (!isset($play['play_time'])) return false;
+                try {
+                    $playTime = Carbon::parse($play['play_time']);
+                } catch (\Exception $e) {
+                    return false;
+                }
+                return $playTime->greaterThanOrEqualTo(now()->subDay());
+            })->take(10)->values();
 
             $recentPlays->transform(function ($play) {
-                $play->mods_list = $this->decodeMods($play->mods);
+                $play['mods_list'] = $this->decodeMods($play['mods']);
                 return $play;
             });
         }
@@ -495,21 +478,22 @@ class UserController extends Controller
         return response()->json($response);
     }
 
-    public function invites($id) {
+    public function invites($id)
+    {
         $user = Auth::user();
 
         if (!$user) {
             return redirect('/login')->with('error', 'You must be logged in to view your invites.');
         }
-         
-        if($user->id != $id) {
+
+        if ($user->id != $id) {
             return redirect()->back()->with('error', "You don't have access to other people's invites.");
         }
         // Ambil semua undangan milik user
         $invites = DB::table('invites')
             ->where('userid', $user->id)
             ->get();
-        
+
         // Ambil semua kode undangan yang sudah digunakan beserta user yang menggunakannya dan waktu digunakan
         $usedInvites = DB::table('invite_usage')
             ->pluck('code_user', 'invite_code')
@@ -524,8 +508,8 @@ class UserController extends Controller
         $usedUsers = [];
         if (!empty($usedUserIds)) {
             $usedUsers = User::whereIn('id', $usedUserIds)
-            ->pluck('name', 'id')
-            ->toArray();
+                ->pluck('name', 'id')
+                ->toArray();
         }
 
         // Tandai setiap undangan apakah sudah digunakan, oleh siapa, kapan, dan id user yang menggunakan

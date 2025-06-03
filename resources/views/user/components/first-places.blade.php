@@ -159,8 +159,8 @@
                                 @endforeach
                             </td>
                             <td style="width: 5%"> {{ $item->acc }}% </td>
-                            <td style="width: 5%" class="{!! $item->map_status == 2 ? 'text-center' : 'text-center fs-4' !!}">
-                                {!! $item->map_status == 2 ? $item->pp . ' pp' : '<i class="mdi mdi-heart text-danger"></i>' !!}
+                            <td style="width: 5%" class="{!! $item->map_status == 2 ? 'text-end' : 'text-center fs-4' !!}">
+                                {!! $item->map_status == 2 ? number_format($item->pp, 0) . ' pp' : '<i class="mdi mdi-heart text-danger"></i>' !!}
                             </td>
                         </tr>
                     @endforeach

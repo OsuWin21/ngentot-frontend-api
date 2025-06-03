@@ -6,24 +6,11 @@
                 <button class="btn btn-gradient-primary dropdown-toggle" type="button" id="modeDropdown"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     @switch($mode)
-                        @case(0)
-                            Standard
-                        @break
-
-                        @case(1)
-                            Taiko
-                        @break
-
-                        @case(2)
-                            Catch
-                        @break
-
-                        @case(3)
-                            Mania
-                        @break
-
-                        @default
-                            Standard
+                        @case(0) Standard @break
+                        @case(1) Taiko @break
+                        @case(2) Catch @break
+                        @case(3) Mania @break
+                        @default Standard
                     @endswitch
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="modeDropdown">
@@ -34,12 +21,14 @@
                                     ? route('profile', [
                                         'id' => $user->id,
                                         'mode' => $m,
-                                        'rx' => 0,
+                                        'rx' => $rx,
+                                        'sort' => request('sort', 'pp')
                                     ])
                                     : (request()->routeIs('leaderboard')
                                         ? route('leaderboard', [
                                             'mode' => $m,
-                                            'rx' => 0,
+                                            'rx' => $rx,
+                                            'sort' => request('sort', 'pp')
                                         ])
                                         : '#')
                                 }}">
@@ -54,20 +43,10 @@
                 <button class="btn btn-gradient-primary dropdown-toggle" type="button" id="rxDropdown"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     @switch($rx)
-                        @case(0)
-                            Vanilla
-                        @break
-
-                        @case(4)
-                            Relax
-                        @break
-
-                        @case(8)
-                            AutoPilot
-                        @break
-
-                        @default
-                            Vanilla
+                        @case(0) Vanilla @break
+                        @case(4) Relax @break
+                        @case(8) AutoPilot @break
+                        @default Vanilla
                     @endswitch
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="rxDropdown">
@@ -82,13 +61,15 @@
                                         'id' => $user->id,
                                         'mode' => $mode,
                                         'rx' => $r,
+                                        'sort' => request('sort', 'pp')
                                     ])
                                     : (!$disabled && request()->routeIs('leaderboard')
                                         ? route('leaderboard', [
-                                        'mode' => $mode,
-                                        'rx' => $r,
-                                    ])
-                                    :   '#')}}"
+                                            'mode' => $mode,
+                                            'rx' => $r,
+                                            'sort' => request('sort', 'pp')
+                                        ])
+                                        :   '#')}}"
                                 @if ($disabled) aria-disabled="true" @endif>
                                 {{ $name }}
                                 @if ($disabled)

@@ -6,9 +6,10 @@
             <table class="table table-hover">
                 <tbody>
                     @foreach ($recent_plays as $item)
+                    {{-- @dd($item) --}}
                         <tr>
                             <td style="width: 5%; text-align: center;">
-                                @switch($item->grade)
+                                @switch($item['grade'])
                                     @case('XH')
                                         <img src="https://raw.githubusercontent.com/ppy/osu-web/aee49df28def2cd5b467bb5c597a0cbf16b59d4c/public/images/badges/score-ranks-v2019/GradeSmall-SS-Silver.svg"
                                             alt="image" />
@@ -56,14 +57,14 @@
                                 @endswitch
                             </td>
                             <td style="width: 50%; max-width: 300px"><a class="text-decoration-none link-primary"
-                                    href="https://osu.ppy.sh/b/{{ $item->id }}">{{ Str::limit($item->map_title, 40) }}
+                                    href="https://osu.ppy.sh/b/{{ $item['beatmap']['id'] }}">{{ Str::limit($item['beatmap']['title'], 40) }}
                                     by
-                                    {{ Str::limit($item->map_artist, 20) }}</a><br>{{ $item->map_version }} - <small
-                                    class="text-body-secondary">{{ \Carbon\Carbon::parse($item->play_time)->diffForHumans() }}<small>
+                                    {{ Str::limit($item['beatmap']['artist'], 20) }}</a><br>{{ $item['beatmap']['version'] }} - <small
+                                    class="text-body-secondary">{{ \Carbon\Carbon::parse($item['play_time'])->diffForHumans() }}<small>
                             </td>
 
                             <td style="width: 15%" class="text-end pe-5">
-                                @foreach ($item->mods_list as $mods)
+                                @foreach ($item['mods_list'] as $mods)
                                     @if ($mods == 'None')
                                     @elseif ($mods == 'No Fail')
                                         <img src="https://raw.githubusercontent.com/ppy/osu-web/refs/heads/master/public/images/badges/mods/mod_no-fail.png?"
@@ -158,9 +159,9 @@
                                     @endif
                                 @endforeach
                             </td>
-                            <td style="width: 5%"> {{ $item->acc }}% </td>
-                            <td style="width: 5%" class="{!! $item->map_status == 2 ? 'text-center' : 'text-center fs-4' !!}">
-                                {!! $item->map_status == 2 ? $item->pp . ' pp' : '<i class="mdi mdi-heart text-danger"></i>' !!}
+                            <td style="width: 5%"> {{ $item['acc'] }}% </td>
+                            <td style="width: 5%" class="{!! $item['beatmap']['status'] == 2 ? 'text-end' : 'text-center fs-4' !!}">
+                                {!! $item['beatmap']['status'] == 2 ? number_format($item['pp'], 0) . 'pp' : '<i class="mdi mdi-heart text-danger"></i>' !!}
                             </td>
                         </tr>
                     @endforeach

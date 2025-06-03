@@ -30,7 +30,14 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-primary text-white me-2">
                                 <i class="mdi mdi-account"></i>
-                            </span>Performance(PP) Ranking
+                            </span>
+                            @if ($sort == 'pp')
+                                Performance(PP) Ranking
+                            @elseif ($sort == 'rscore')
+                                Ranked Score Leaderboard
+                            @else
+                                Leaderboard
+                            @endif
                         </h3>
                     </div>
                     <div class="row">
@@ -38,7 +45,15 @@
                             <div class="card">
                                 <div class="card-body table-responsive">
                                     <div class="d-flex">
-                                        <h4 class="card-title">Performance Leaderboard</h4>
+                                        <h4 class="card-title">
+                                            @if ($sort == 'pp')
+                                                Performance Ranking
+                                            @elseif ($sort == 'rscore')
+                                                Score Ranking
+                                            @else
+                                                Leaderboard
+                                            @endif
+                                        </h4>
                                         @include('user.layouts.mode-selector')
                                     </div>
                                     <table class="table table-hover mt-3">
@@ -58,26 +73,30 @@
                                         <tbody>
                                             @foreach ($leaderboard as $item)
                                                 <tr>
-                                                    <th scope="row" class="text-center">{{ $item->rank }}</td>
+                                                    {{-- @dd($item) --}}
+                                                    <th scope="row" class="text-center">{{ $item['rank'] }}</th>
                                                     <td>
-                                                        @if (isset($item->flag_url))
-                                                            <img class="me-1" src="{{ $item->flag_url }}" alt="{{ $item->country }}"
-                                                                width="24" height="18"
-                                                                style="vertical-align: middle;">
+                                                        @if (isset($item['flag_url']))
+                                                            <img class="me-1" src="{{ $item['flag_url'] }}"
+                                                                alt="{{ $item['country'] }}" width="24"
+                                                                height="18" style="vertical-align: middle;">
                                                         @else
-                                                            {{ $item->country }}
+                                                            {{ $item['country'] }}
                                                         @endif
-                                                        <a href="u/{{ $item->id }}?mode={{ $mode }}&rx={{ $rx }}" class="link link-primary text-decoration-none">{{ $item->name }}</a>
+                                                        <a href="u/{{ $item['player_id'] }}?mode={{ $mode }}&rx={{ $rx }}"
+                                                            class="link link-primary text-decoration-none">{{ $item['name'] }}</a>
                                                     </td>
-                                                    <td>{{ number_format($item->Accuracy, 3) }}%</td>
-                                                    <td>{{ number_format($item->Play_Count) }}</td>
-                                                    <td>{{ number_format($item->Ranked_Score) }}</td>
-                                                    <td><span
-                                                            class="badge bg-gradient-primary">{{ number_format($item->Performance) }}
-                                                            pp</span></td>
-                                                    <td>{{ $item->SS }}</td>
-                                                    <td>{{ $item->S }}</td>
-                                                    <td>{{ $item->A }}</td>
+                                                    <td>{{ number_format($item['acc'], 3) }}%</td>
+                                                    <td>{{ number_format($item['plays']) }}</td>
+                                                    <td>{{ number_format($item['rscore']) }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge bg-gradient-primary">{{ number_format($item['pp']) }}
+                                                            pp</span>
+                                                    </td>
+                                                    <td>{{ $item['xh_count'] + $item['x_count'] }}</td>
+                                                    <td>{{ $item['sh_count'] + $item['s_count'] }}</td>
+                                                    <td>{{ $item['a_count'] }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

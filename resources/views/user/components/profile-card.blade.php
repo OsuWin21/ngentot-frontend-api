@@ -113,19 +113,42 @@
                         @endif
                     </div>
                     <div class="row g-0">
+                        @php
+                            $keyLabels = [
+                                'id' => 'User ID',
+                                'mode' => 'Mode',
+                                'tscore' => 'Total Score',
+                                'rscore' => 'Ranked Score',
+                                'pp' => 'Performance Points',
+                                'plays' => 'Play Count',
+                                'playtime' => 'Total Play Time',
+                                'acc' => 'Hit Accuracy',
+                                'max_combo' => 'Max Combo',
+                                'total_hits' => 'Total Hits',
+                                'replay_views' => 'Replay Views',
+                                'xh_count' => 'XH Count',
+                                'x_count' => 'X Count',
+                                'sh_count' => 'SH Count',
+                                's_count' => 'S Count',
+                                'a_count' => 'A Count',
+                            ];
+                            $hiddenKeys = ['id', 'mode'];
+                        @endphp
                         @foreach ((array) $user_profile as $key => $value)
-                            <div class="col-6 p-1">{{ $key }}</div>
-                            <div class="col-6 p-1">
-                                @if ($key === 'Total Play Time')
-                                    {{ number_format($value / 3600, 2) }} hours
-                                @elseif($key === 'Hit Accuracy')
-                                    {{ number_format($value, 3) }}%
-                                @elseif(is_numeric($value) && $value >= 1000)
-                                    {{ number_format($value) }}
-                                @else
-                                    {{ $value }}
-                                @endif
-                            </div>
+                            @if (!in_array($key, $hiddenKeys))
+                                <div class="col-6 p-1">{{ $keyLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</div>
+                                <div class="col-6 p-1">
+                                    @if ($key === 'playtime')
+                                        {{ number_format($value / 3600, 2) }} hours
+                                    @elseif($key === 'acc')
+                                        {{ number_format($value, 3) }}%
+                                    @elseif(is_numeric($value) && $value >= 1000)
+                                        {{ number_format($value) }}
+                                    @else
+                                        {{ $value }}
+                                    @endif
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>

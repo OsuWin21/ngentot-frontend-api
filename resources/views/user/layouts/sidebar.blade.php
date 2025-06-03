@@ -64,11 +64,11 @@
             </a>
             <div class="collapse" id="ranking-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="/leaderboard?mode=0&rx=8&sort=pp">Performance</a>
+                    <li class="nav-item"> <a class="nav-link" href="/leaderboard?sort=pp&mode=0">Performance</a>
                     </li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Score</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Countries</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Clans</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="/leaderboard?sort=rscore&mode=0">Score</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Countries - Soon~</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Clans - Soon~</a></li>
                 </ul>
             </div>
         </li>
