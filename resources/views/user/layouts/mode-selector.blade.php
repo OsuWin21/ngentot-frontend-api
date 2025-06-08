@@ -1,4 +1,4 @@
-<div class="col-sm d-flex px-0 align-items-center justify-content-end">
+<div class="col-sm-4 d-flex px-0 align-items-center justify-content-end">
     <div class="card-profile-modes position-relative">
         <div class="d-flex align-items-center flex-wrap gap-3 justify-content-end">
             <!-- Mode Selector -->

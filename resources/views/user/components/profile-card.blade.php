@@ -23,20 +23,20 @@
                     </a>
                 </div>
             </div>
-            <div class="col-sm-2 px-0 d-flex gap-2">
-                <div class="card-profile-name position-relative pt-1">
-                    <a class="text-decoration-none text-black" href="#" style="height: fit-content !important;">
-                        <img src="{{ $user->flag_url }}" alt="{{ $user->country }}" srcset="" width="30px">
-                    </a>
+            <div class="col-sm px-0 d-flex flex-column gap-2">
+                <div class="d-flex gap-2">
+                    <div class="card-profile-name position-relative pt-1">
+                        <a class="text-decoration-none text-black" href="#" style="height: fit-content !important;">
+                            <img src="{{ $user->flag_url }}" alt="{{ $user->country }}" srcset="" width="30px">
+                        </a>
+                    </div>
+                    <div class="card-profile-details position-relative">
+                        <h3 class="fs-3 m-0">{{ $user->name }}</h3>
+                        <a class="text-decoration-none text-muted" href="#">
+                            Clans Soon.
+                        </a>
+                    </div>
                 </div>
-                <div class="card-profile-details position-relative">
-                    <h3 class="fs-3 m-0">{{ $user->name }}</h3>
-                    <a class="text-decoration-none text-muted" href="#">
-                        Clans Soon.
-                    </a>
-                </div>
-            </div>
-            <div class="col-sm-4 px-0">
                 <div id="player-status-display" class="d-flex align-items-center gap-2">
                     <span id="status-icon" class="text-success">
                         <!-- Hanya satu elemen ikon -->
