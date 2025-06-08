@@ -5,7 +5,10 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>osu!win21 - Performance(pp) Ranking</title>
+    <title>
+        osu!win21 - 
+        {{ $sort == 'pp' ? 'Performance(PP) Ranking' : ($sort == 'rscore' ? 'Ranked Score Leaderboard' : 'Leaderboard') }}
+    </title>
 
     <!-- plugins:css -->
     <link rel="stylesheet" href="{{ asset('assets/user/vendors/mdi/css/materialdesignicons.min.css') }}">
