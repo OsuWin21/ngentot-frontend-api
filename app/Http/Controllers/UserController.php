@@ -229,7 +229,6 @@ class UserController extends Controller
         if (!$user) {
             return redirect('/')->with('error', 'User not found');
         } else {
-
             if ($user && $user->country) {
                 $user->flag_url = $this->getTwemojiFlagUrl($user->country);
                 $user->country_name = country($user->country)->getOfficialName();
@@ -306,7 +305,6 @@ class UserController extends Controller
                     ->where('scores.userid', $id)
                     ->where('scores.mode', $combinedMode)
                     ->orderBy('scores.play_time', 'desc')
-                    ->take(10)
                     ->get()
                     ->map(function ($pp) {
                         $pp->pp = (int)$pp->pp;
@@ -347,7 +345,6 @@ class UserController extends Controller
                     ->where('scores.userid', $id)
                     ->where('scores.mode', $mode)
                     ->orderBy('scores.play_time', 'desc')
-                    ->take(10)
                     ->get()
                     ->map(function ($pp) {
                         $pp->pp = (int)$pp->pp;
@@ -361,21 +358,21 @@ class UserController extends Controller
             });
 
             # Get the user's top plays
-            $topPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=best&id={$id}&mode={$combinedMode}&limit=10&include_loved=false&include_failed=false";
+            $topPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=best&id={$id}&mode={$combinedMode}&limit=100&include_loved=false&include_failed=false";
             $response = Http::get($topPlaysUrl);
             if ($response->successful()) {
                 $topPlays = collect($response->json()["scores"] ?? []);
             } else {
                 $topPlays = collect([]);
             }
-            
+
             $topPlays->transform(function ($play) {
                 $play['mods_list'] = $this->decodeMods($play['mods']);
                 return $play;
             });
 
             # Get the user's recent plays
-            $recentPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=recent&id={$id}&mode={$combinedMode}&limit=50&include_loved=true&include_failed=true";
+            $recentPlaysUrl = env('API_OSU_URL') . "/v1/get_player_scores?scope=recent&id={$id}&mode={$combinedMode}&limit=100&include_loved=true&include_failed=true";
             $response = Http::get($recentPlaysUrl);
             if ($response->successful()) {
                 $recentPlays = collect($response->json()["scores"] ?? []);
@@ -393,7 +390,7 @@ class UserController extends Controller
                     return false;
                 }
                 return $playTime->greaterThanOrEqualTo(now()->subDay());
-            })->take(10)->values();
+            })->take(100)->values();
 
             $recentPlays->transform(function ($play) {
                 $play['mods_list'] = $this->decodeMods($play['mods']);

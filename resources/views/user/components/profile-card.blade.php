@@ -23,7 +23,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-sm-3 px-0 d-flex gap-2">
+            <div class="col-sm-2 px-0 d-flex gap-2">
                 <div class="card-profile-name position-relative pt-1">
                     <a class="text-decoration-none text-black" href="#" style="height: fit-content !important;">
                         <img src="{{ $user->flag_url }}" alt="{{ $user->country }}" srcset="" width="30px">
@@ -34,6 +34,15 @@
                     <a class="text-decoration-none text-muted" href="#">
                         Clans Soon.
                     </a>
+                </div>
+            </div>
+            <div class="col-sm-4 px-0">
+                <div id="player-status-display" class="d-flex align-items-center gap-2">
+                    <span id="status-icon" class="text-success">
+                        <!-- Hanya satu elemen ikon -->
+                        <i class="mdi mdi-circle-medium"></i> <!-- Ganti ke size medium -->
+                    </span>
+                    <span id="status-text">Loading...</span>
                 </div>
             </div>
             @include('user.layouts.mode-selector')
@@ -136,7 +145,8 @@
                         @endphp
                         @foreach ((array) $user_profile as $key => $value)
                             @if (!in_array($key, $hiddenKeys))
-                                <div class="col-6 p-1">{{ $keyLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</div>
+                                <div class="col-6 p-1">{{ $keyLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
+                                </div>
                                 <div class="col-6 p-1">
                                     @if ($key === 'playtime')
                                         {{ number_format($value / 3600, 2) }} hours

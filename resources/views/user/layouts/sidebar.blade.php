@@ -10,7 +10,7 @@
                     @else
                         <img src="{{ asset('storage/avatars/default.png') }}" alt="profile">
                     @endif
-                    {{-- <span class="login-status online"></span> --}}
+                    <span class="availability-status online"></span>
                 </div>
                 <div class="nav-profile-text d-flex flex-column">
                     <span class="font-weight-bold[]">
